@@ -3,8 +3,12 @@ require 'sinatra/static_assets'
 
 class RandomBritishGuy < Sinatra::Base
   get '/' do
-    @random_guy = RandomBritishGuyFetcher.new.final_url
-    erb :index
+    begin
+      @random_guy = RandomBritishGuyFetcher.new.final_url
+      erb :index
+    rescue RandomBritishGuyFetcher::Error
+      erb :error
+    end
   end
 
   helpers do

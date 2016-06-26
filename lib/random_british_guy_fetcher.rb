@@ -2,15 +2,18 @@
 load './config/initializers/google_cse_api.rb'
 
 class RandomBritishGuyFetcher
-  attr_reader :result, :items, :links, :q, :randomizer
-  GUYS = ["David Tennant", "Idris Elba", "Tom Hiddleston", "benedict cumberbatch"].freeze
+  class Error < StandardError
+  end
+  attr_reader :result, :items, :links, :q, :randomizer, :final_url
+  GUYS = ["David Tennant", "Idris Elba", "Tom Hiddleston", "benedict cumberbatch", "hugh grant", "toby stephens", "aidan turner", "colin firth"].freeze
+
   def final_url
     links[randomizer.rand(10)]
   end
 
   private
 
-  def produce_url
+  def google_search_url
     "https://www.googleapis.com/customsearch/v1?q=#{q}&cx=#{GOOGLE_SEARCH_CX}&searchType=image&start=#{randomizer.rand(100)}&key=#{GOOGLE_API_KEY}"
   end
 
@@ -25,11 +28,17 @@ class RandomBritishGuyFetcher
   end
 
   def result
-    @result ||= HTTParty.get(produce_url, verify: false)
+    begin
+      @result ||= HTTParty.get(google_search_url, verify: false)
+      @result.parsed_response.fetch("error")
+      @result
+    rescue
+      raise RandomBritishGuyFetcher::Error
+    end
   end
 
   def items
-    @items ||= result.parsed_response['items']
+    @items ||= result.parsed_response.fetch("items")
   end
 
   def links
