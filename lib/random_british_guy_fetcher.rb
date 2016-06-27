@@ -30,9 +30,10 @@ class RandomBritishGuyFetcher
   def result
     begin
       @result ||= HTTParty.get(google_search_url, verify: false)
-      @result.parsed_response.fetch("error")
+      raise RandomBritishGuyFetcher::Error if @result.parsed_response.fetch("error", nil)
       @result
     rescue
+      puts "error"
       raise RandomBritishGuyFetcher::Error
     end
   end
