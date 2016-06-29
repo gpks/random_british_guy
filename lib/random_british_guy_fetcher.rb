@@ -4,11 +4,11 @@ load './config/initializers/google_cse_api.rb'
 class RandomBritishGuyFetcher
   class Error < StandardError
   end
-  attr_reader :result, :items, :links, :q, :randomizer, :final_url
+  attr_reader :result, :items, :link, :q, :randomizer, :final_url
   GUYS = ["David Tennant", "Idris Elba", "Tom Hiddleston", "benedict cumberbatch", "hugh grant", "toby stephens", "aidan turner", "colin firth"].freeze
 
   def final_url
-    links[randomizer.rand(10)]
+    link
   end
 
   private
@@ -33,7 +33,6 @@ class RandomBritishGuyFetcher
       raise RandomBritishGuyFetcher::Error if @result.parsed_response.fetch("error", nil)
       @result
     rescue
-      puts "error"
       raise RandomBritishGuyFetcher::Error
     end
   end
@@ -42,7 +41,7 @@ class RandomBritishGuyFetcher
     @items ||= result.parsed_response.fetch("items")
   end
 
-  def links
-    @links ||= items.map { |item| item.fetch("link") }
+  def link
+    @link ||= items[randomizer.rand(10)].fetch("link")
   end
 end

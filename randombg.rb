@@ -17,3 +17,5 @@ class RandomBritishGuy < Sinatra::Base
     end
   end
 end
+
+# rackup -p4567
